@@ -1,0 +1,119 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vispek-hc"
+version = "0.1.0"
+description = "SDK and command line for the Vispek HC1500 multispectral camera (17 LED bands, UV to NIR)"
+dynamic = ["readme"]  # README.md with absolute links: hatch_build.py
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD-PARTY-NOTICES.md", "tools/uvc-util/LICENSE"]
+authors = [
+    { name = "Jian Liu", email = "jian.liu@vispek.cn" },
+    { name = "VISPEK Technology Co., Ltd", email = "contact@vispek.cn" },
+]
+keywords = ["multispectral", "camera", "spectral imaging", "uvc", "led"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.26",
+    "pyserial>=3.5",
+    "Pillow>=10.1",
+]
+
+[project.optional-dependencies]
+opencv = ["opencv-python>=4.9"]
+plot = ["matplotlib>=3.8"]
+analysis = ["scikit-learn>=1.4"]
+all = ["vispek-hc[opencv,plot,analysis]"]
+
+[project.scripts]
+vispek-hc = "vispek_hc.cli:main"
+
+[project.urls]
+Repository = "https://github.com/vispek/vispek-hc-camera"
+Changelog = "https://github.com/vispek/vispek-hc-camera/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.100",
+    "jsonschema>=4.21",
+    "mypy>=1.11",
+    "pre-commit>=3.7",
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "pytest-timeout>=2.3",
+    "ruff>=0.6",
+    "twine>=6.1",
+    "types-pyserial>=3.5",
+]
+
+[tool.hatch.metadata.hooks.custom]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vispek_hc"]
+
+# The macOS camera-control helper goes into the wheel as source files (MIT, unmodified),
+# never as a binary: 'vispek-hc setup' compiles it on the user's Mac.
+[tool.hatch.build.targets.wheel.force-include]
+"tools/uvc-util/src" = "vispek_hc/_uvc_util/src"
+"tools/uvc-util/LICENSE" = "vispek_hc/_uvc_util/LICENSE"
+"tools/uvc-util/SHA256SUMS" = "vispek_hc/_uvc_util/SHA256SUMS"
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/docs", "/schemas", "/examples", "/tools", "/.github", "/*.md", "/LICENSE", "/NOTICE", "/llms.txt", "/hatch_build.py"]
+exclude = ["tools/uvc-util/build"]  # build output
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+extend-exclude = ["tools/uvc-util", "docs/acceptance"]  # vendored code; records kept verbatim
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PTH", "T20"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/vispek_hc/cli.py" = ["T20"]
+"examples/*" = ["T20"]
+
+[tool.mypy]
+strict = true
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["cv2", "cv2.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config -m 'not hardware'"
+markers = [
+    "hardware: needs a real HC1500 on this machine; run explicitly with -m hardware",
+]
+timeout = 60
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source_pkgs = ["vispek_hc"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+exclude_also = ["if TYPE_CHECKING:", "@overload"]

@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vispek-hc:schema:capture-1",
+  "title": "capture.json of a vispek-hc capture folder",
+  "description": "Readers of /1 accept every /1 file: fields are only ever added, and unknown fields are ignored.",
+  "type": "object",
+  "required": [
+    "schema",
+    "capture_id",
+    "software",
+    "model",
+    "led_table",
+    "signal_domain",
+    "recording",
+    "config",
+    "groups"
+  ],
+  "properties": {
+    "schema": {
+      "const": "vispek-hc.capture/1"
+    },
+    "capture_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "software": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ]
+    },
+    "model": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "led_table": {
+      "type": "object",
+      "required": [
+        "version",
+        "verified"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "signal_domain": {
+      "enum": [
+        "dominant_channel_v1",
+        "luma_bt601_v1"
+      ]
+    },
+    "reduction": {
+      "enum": [
+        "dominant",
+        "luma"
+      ]
+    },
+    "recording": {
+      "type": "object",
+      "required": [
+        "mode",
+        "status",
+        "groups_done",
+        "started_at_utc",
+        "finished_at_utc"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "scan",
+            "single",
+            "dark",
+            "video"
+          ]
+        },
+        "role": {
+          "enum": [
+            null,
+            "white",
+            "dark"
+          ]
+        },
+        "cycles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "average": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "enum": [
+            "partial",
+            "complete"
+          ]
+        },
+        "groups_done": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "started_at_utc": {
+          "type": "string"
+        },
+        "finished_at_utc": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "frames": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "device": {
+      "type": "object"
+    },
+    "config": {
+      "type": "object"
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "group_id",
+          "status",
+          "failure",
+          "dark",
+          "frames"
+        ],
+        "properties": {
+          "group_id": {
+            "type": "string",
+            "pattern": "^g[0-9]{4,}$"
+          },
+          "status": {
+            "enum": [
+              "partial",
+              "complete",
+              "failed"
+            ]
+          },
+          "failure": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "code",
+                  "message"
+                ]
+              }
+            ]
+          },
+          "dark": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/frame"
+              }
+            ]
+          },
+          "frames": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/frame"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "led_id",
+                    "nm"
+                  ],
+                  "properties": {
+                    "led_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "nm": {
+                      "type": "integer"
+                    },
+                    "pwm": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1023
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "frame": {
+      "$ref": "#/$defs/frame"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "frames_index": {
+      "const": "frames.jsonl",
+      "description": "video captures: one frame entry per line"
+    }
+  },
+  "$defs": {
+    "frame": {
+      "type": "object",
+      "required": [
+        "file",
+        "sha256",
+        "bytes",
+        "encoding",
+        "width",
+        "height",
+        "host_frame_counter",
+        "received_at_utc",
+        "received_mono_ns"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^[^/\\\\]+\\.(png|jpg)$",
+          "description": "a plain file name inside the group folder"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "encoding": {
+          "enum": [
+            "png",
+            "jpeg"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "host_frame_counter": {
+          "type": "integer"
+        },
+        "received_at_utc": {
+          "type": "string"
+        },
+        "received_mono_ns": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

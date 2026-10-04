@@ -1,0 +1,5 @@
+# Safety-critical files need a maintainer review.
+/SAFETY.md                      @liujdream
+/src/vispek_hc/safety.py        @liujdream
+/src/vispek_hc/illuminator.py   @liujdream
+/src/vispek_hc/models.py        @liujdream

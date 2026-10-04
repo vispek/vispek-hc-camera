@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vispek-hc:schema:cli-envelope-1",
+  "title": "What 'vispek-hc --json' prints on stdout: exactly one of these",
+  "type": "object",
+  "required": [
+    "schema",
+    "command",
+    "version",
+    "ok",
+    "warnings",
+    "exit_code"
+  ],
+  "properties": {
+    "schema": {
+      "const": "vispek-hc.cli/1"
+    },
+    "command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "version": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object"
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message",
+        "hint",
+        "details"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z_]+$"
+        },
+        "message": {
+          "type": "string"
+        },
+        "hint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "details": {
+          "type": "object"
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        130
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "data"
+      ],
+      "not": {
+        "required": [
+          "error"
+        ]
+      },
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "exit_code": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "required": [
+        "error"
+      ],
+      "not": {
+        "required": [
+          "data"
+        ]
+      },
+      "properties": {
+        "ok": {
+          "const": false
+        },
+        "exit_code": {
+          "not": {
+            "const": 0
+          }
+        }
+      }
+    }
+  ]
+}

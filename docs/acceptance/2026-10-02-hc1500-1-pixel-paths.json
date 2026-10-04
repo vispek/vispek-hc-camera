@@ -1,0 +1,40 @@
+{
+ "started_at_utc": "2026-10-02T02:40:56+00:00",
+ "software_version": "0.1.0.dev0",
+ "unit": "hc1500-1",
+ "simulated": false,
+ "checks": {
+  "pixel_paths": {
+   "uncompressed": {
+    "median_rgb": [
+     5,
+     5,
+     5
+    ],
+    "led_id": 9,
+    "steps": [
+     {
+      "pwm": 72,
+      "peak_dn": 255
+     }
+    ],
+    "pixel_format": "yuyv422"
+   },
+   "mjpeg": {
+    "median_rgb": [
+     5,
+     5,
+     5
+    ],
+    "led_id": 9,
+    "steps": [
+     {
+      "pwm": 72,
+      "peak_dn": 255
+     }
+    ],
+    "pixel_format": "mjpeg"
+   }
+  }
+ }
+}

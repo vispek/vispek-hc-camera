@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "vispek-hc: SDK and command line for the Vispek HC1500 multispectral camera"
+type: software
+authors:
+  - name: "Vispek"
+license: Apache-2.0
+repository-code: "https://github.com/vispek/vispek-hc-camera"

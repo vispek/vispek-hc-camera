@@ -1,0 +1,22 @@
+# vispek-hc
+
+> SDK and command line for the Vispek HC1500 multispectral camera (17 LED bands,
+> 255-1050 nm, one USB camera, serial-controlled light source).
+
+- [AGENTS.md](AGENTS.md): start here; safety invariants, commands, repository map
+- [SAFETY.md](SAFETY.md): UV hazard and what the software does about it
+- [docs/api.md](docs/api.md): the public Python names
+- [docs/cli.md](docs/cli.md): every command and the shape of its JSON output
+- [docs/data-format.md](docs/data-format.md): cube, capture folder, cube.npz, export
+- [docs/calibration.md](docs/calibration.md): what the numbers mean, white references, binding
+- [docs/integration-guide.md](docs/integration-guide.md): the device itself, for writing your own control software in any language without this package (self-contained)
+- [docs/hardware.md](docs/hardware.md): LED table, camera, physical facts
+- [docs/protocol.md](docs/protocol.md): serial protocol of the light source, with test vectors
+- [docs/platforms.md](docs/platforms.md): what works on macOS, Linux, Windows
+- [docs/architecture.md](docs/architecture.md): modules, concurrency, the scan, timeouts
+- [docs/errors.md](docs/errors.md): error codes and exit codes
+- [docs/troubleshooting.md](docs/troubleshooting.md): by symptom
+- [schemas/](schemas/): JSON Schemas of the file formats and of the CLI output
+- [examples/](examples/): 13 short scripts that run offline
+- [docs/provenance.md](docs/provenance.md): what the implementation was written from
+- [CHANGELOG.md](CHANGELOG.md): what exists in each version

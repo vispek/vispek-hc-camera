@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vispek-hc:schema:cube-metadata-1",
+  "title": "metadata_json of cube.npz (schema vispek-hc.cube/1)",
+  "type": "object",
+  "required": [
+    "layer",
+    "unit",
+    "signal_domain",
+    "reduction",
+    "axes",
+    "synchronization",
+    "registration",
+    "led_table",
+    "bands"
+  ],
+  "properties": {
+    "layer": {
+      "enum": [
+        "L1",
+        "L2"
+      ]
+    },
+    "unit": {
+      "enum": [
+        "image_code_value",
+        "relative_to_white"
+      ]
+    },
+    "signal_domain": {
+      "enum": [
+        "dominant_channel_v1",
+        "luma_bt601_v1"
+      ]
+    },
+    "reduction": {
+      "enum": [
+        "dominant",
+        "luma"
+      ]
+    },
+    "axes": {
+      "const": "YXB"
+    },
+    "synchronization": {
+      "const": "sequential_not_simultaneous"
+    },
+    "registration": {
+      "const": "not_verified"
+    },
+    "bands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "band_id",
+          "name",
+          "center_nm",
+          "dominant_channel"
+        ],
+        "properties": {
+          "band_id": {
+            "type": "string",
+            "pattern": "^led_[0-9]{2}$"
+          },
+          "center_nm": {
+            "type": "integer"
+          },
+          "dominant_channel": {
+            "enum": [
+              "R",
+              "G",
+              "B"
+            ]
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "required": [
+        "calibration_id",
+        "calibration_json_sha256",
+        "binding_overridden"
+      ]
+    }
+  },
+  "if": {
+    "properties": {
+      "layer": {
+        "const": "L2"
+      }
+    }
+  },
+  "then": {
+    "required": [
+      "calibration"
+    ],
+    "properties": {
+      "unit": {
+        "const": "relative_to_white"
+      }
+    }
+  }
+}

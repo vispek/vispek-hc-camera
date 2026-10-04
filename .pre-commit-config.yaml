@@ -1,0 +1,24 @@
+exclude: ^tools/uvc-util/(src/|LICENSE|SHA256SUMS)
+repos:
+  - repo: local
+    hooks:
+      # Runs the ruff pinned in uv.lock, so the hook and CI never disagree.
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=5120]
+      - id: end-of-file-fixer
+      - id: detect-private-key

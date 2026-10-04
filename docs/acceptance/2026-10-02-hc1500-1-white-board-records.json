@@ -1,0 +1,392 @@
+{
+ "started_at_utc": "2026-10-02T04:30:29+00:00",
+ "software_version": "0.1.0.dev0",
+ "unit": "hc1500-1",
+ "simulated": false,
+ "checks": {
+  "white_reference": {
+   "pwm_by_led": {
+    "5": 96,
+    "6": 896,
+    "7": 1023,
+    "8": 592,
+    "9": 144,
+    "10": 144,
+    "11": 144,
+    "12": 592,
+    "13": 592,
+    "14": 600,
+    "15": 600,
+    "16": 1023,
+    "17": 1023
+   },
+   "auto_pwm_notes": [
+    "LED 7: no PWM puts the white board at 150-235; using 1023 (the brightest value that did not clip)",
+    "LED 17: no PWM puts the white board at 150-235; using 1023 (the brightest value that did not clip)"
+   ],
+   "dominant_channel_by_led": {
+    "5": "B",
+    "6": "G",
+    "7": "G",
+    "8": "R",
+    "9": "R",
+    "10": "R",
+    "11": "R",
+    "12": "R",
+    "13": "B",
+    "14": "B",
+    "15": "B",
+    "16": "B",
+    "17": "B"
+   },
+   "differs_from_model": {
+    "13": {
+     "model": "R",
+     "white": "B"
+    },
+    "14": {
+     "model": "R",
+     "white": "B"
+    },
+    "15": {
+     "model": "R",
+     "white": "B"
+    },
+    "16": {
+     "model": "R",
+     "white": "B"
+    },
+    "17": {
+     "model": "R",
+     "white": "B"
+    }
+   },
+   "quality": [
+    {
+     "band_id": "led_05",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 133.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      17.0,
+      19.0,
+      133.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_06",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 148.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      -5.0,
+      148.0,
+      -5.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_07",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 57.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      -5.0,
+      57.0,
+      -5.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_08",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 157.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      157.0,
+      19.0,
+      -5.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_09",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 115.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      115.0,
+      -5.0,
+      -5.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_10",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 157.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      157.0,
+      14.0,
+      20.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_11",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 130.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      130.0,
+      23.0,
+      19.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_12",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 153.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      153.0,
+      84.0,
+      124.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_13",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 174.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      169.0,
+      117.0,
+      174.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_14",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 157.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      151.0,
+      102.0,
+      157.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_15",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 137.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      129.0,
+      80.0,
+      137.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_16",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 138.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      130.0,
+      81.0,
+      138.0
+     ],
+     "pass": true
+    },
+    {
+     "band_id": "led_17",
+     "valid_fraction": 1.0,
+     "saturated_fraction": 0.0,
+     "white_signal_median": 62.0,
+     "dark_median": 5.0,
+     "dark_p99": 5.0,
+     "rgb_white_median": [
+      55.0,
+      22.0,
+      62.0
+     ],
+     "pass": true
+    }
+   ],
+   "warnings": [],
+   "median_of_board_over_itself": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  "scalar_noise": [
+   {
+    "led_id": 5,
+    "pwm": 96,
+    "frames": 12,
+    "dominant": {
+     "signal_dn": 133.0,
+     "temporal_std_dn": 1.28,
+     "relative_noise": 0.00963,
+     "one_code_value_relative": 0.00752
+    },
+    "luma": {
+     "signal_dn": 31.0,
+     "temporal_std_dn": 0.276,
+     "relative_noise": 0.00892,
+     "one_code_value_relative": 0.03226
+    }
+   },
+   {
+    "led_id": 7,
+    "pwm": 1023,
+    "frames": 12,
+    "dominant": {
+     "signal_dn": 58.17,
+     "temporal_std_dn": 6.472,
+     "relative_noise": 0.11127,
+     "one_code_value_relative": 0.01719
+    },
+    "luma": {
+     "signal_dn": 32.5,
+     "temporal_std_dn": 5.847,
+     "relative_noise": 0.17991,
+     "one_code_value_relative": 0.03077
+    }
+   },
+   {
+    "led_id": 9,
+    "pwm": 144,
+    "frames": 12,
+    "dominant": {
+     "signal_dn": 138.5,
+     "temporal_std_dn": 1.187,
+     "relative_noise": 0.00857,
+     "one_code_value_relative": 0.00722
+    },
+    "luma": {
+     "signal_dn": 51.0,
+     "temporal_std_dn": 0.471,
+     "relative_noise": 0.00924,
+     "one_code_value_relative": 0.01961
+    }
+   },
+   {
+    "led_id": 13,
+    "pwm": 592,
+    "frames": 12,
+    "dominant": {
+     "signal_dn": 169.25,
+     "temporal_std_dn": 0.954,
+     "relative_noise": 0.00564,
+     "one_code_value_relative": 0.00591
+    },
+    "luma": {
+     "signal_dn": 139.0,
+     "temporal_std_dn": 0.471,
+     "relative_noise": 0.00339,
+     "one_code_value_relative": 0.00719
+    }
+   }
+  ],
+  "pixel_paths": {
+   "uncompressed": {
+    "median_rgb": [
+     5,
+     5,
+     5
+    ],
+    "led_id": 9,
+    "steps": [
+     {
+      "pwm": 72,
+      "peak_dn": 103
+     },
+     {
+      "pwm": 144,
+      "peak_dn": 158
+     },
+     {
+      "pwm": 288,
+      "peak_dn": 210
+     },
+     {
+      "pwm": 576,
+      "peak_dn": 255
+     }
+    ],
+    "pixel_format": "yuyv422"
+   },
+   "mjpeg": {
+    "median_rgb": [
+     5,
+     5,
+     5
+    ],
+    "led_id": 9,
+    "steps": [
+     {
+      "pwm": 72,
+      "peak_dn": 104
+     },
+     {
+      "pwm": 144,
+      "peak_dn": 162
+     },
+     {
+      "pwm": 288,
+      "peak_dn": 215
+     },
+     {
+      "pwm": 576,
+      "peak_dn": 255
+     }
+    ],
+    "pixel_format": "mjpeg"
+   }
+  }
+ }
+}

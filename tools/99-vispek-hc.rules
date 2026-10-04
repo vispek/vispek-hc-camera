@@ -1,0 +1,19 @@
+# Vispek HC1500 on Linux: lets every user of this computer open the light source's serial
+# port, without membership of the dialout group, and keeps ModemManager from probing it.
+#
+#   sudo cp tools/99-vispek-hc.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+#
+# Then unplug USB1 and plug it in again.
+#
+# MODE 0666 opens the port to every local user. On a shared computer, put the users who
+# may switch the LEDs in the dialout group instead and do not install this file: LEDs 1
+# and 2 are UV-C.
+#
+# This file does not keep brltty away. If the port vanishes a moment after plugging in,
+# remove brltty (sudo apt remove brltty) unless you use a braille display.
+#
+# Not verified on hardware yet.
+
+# The light source: a CH341 USB serial adapter (USB vendor 1a86).
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", MODE="0666", ENV{ID_MM_DEVICE_IGNORE}="1"

@@ -1,0 +1,157 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_NO_PROGRESS: "1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --group dev
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy
+
+  test:
+    name: test (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.12", coverage: true }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: ubuntu-latest, python: "3.14" }
+          - { os: macos-latest, python: "3.12" }
+          - { os: macos-latest, python: "3.14" }
+          - { os: windows-latest, python: "3.12" }
+          - { os: windows-latest, python: "3.14" }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --locked --group dev
+      - if: ${{ !matrix.coverage }}
+        run: uv run pytest
+      - name: the hardware acceptance run, rehearsed on the simulated device
+        env:
+          VISPEK_HC_ACCEPTANCE_SIMULATE: "1"
+          VISPEK_HC_WHITE_BOARD: "1"
+        run: uv run pytest -m hardware tests/hardware --no-cov
+      - if: ${{ matrix.coverage }}
+        run: uv run pytest --cov --cov-report=term-missing
+      - if: ${{ matrix.coverage }}
+        name: protocol.py must stay at 100 % branch coverage
+        run: uv run coverage report --include="*/vispek_hc/protocol.py" --fail-under=100
+      - if: ${{ matrix.coverage }}
+        name: the numbers (reflectance) and the file format (cube) stay fully covered
+        run: |
+          uv run coverage report --include="*/vispek_hc/reflectance.py" --fail-under=100
+          uv run coverage report --include="*/vispek_hc/cube.py" --fail-under=100
+          uv run coverage report --include="*/vispek_hc/calibration.py" --fail-under=95
+
+  uvc-util:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: tools/uvc-util/build.sh
+      - run: tools/uvc-util/build/uvc-util --version
+      - name: the binary runs on Apple silicon and Intel
+        run: lipo -archs tools/uvc-util/build/uvc-util | grep -q "x86_64 arm64"
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.12"
+      - name: an installed wheel compiles the helper from the sources it carries
+        run: |
+          uv build --wheel
+          uv venv --no-project "$RUNNER_TEMP/clean"
+          uv pip install --python "$RUNNER_TEMP/clean/bin/python" dist/*.whl
+          cd "$RUNNER_TEMP"
+          export VISPEK_HC_HOME="$RUNNER_TEMP/home"
+          "$RUNNER_TEMP/clean/bin/vispek-hc" setup --json
+          "$VISPEK_HC_HOME/bin/uvc-util" --version
+          lipo -archs "$VISPEK_HC_HOME/bin/uvc-util" | grep -q "x86_64 arm64"
+
+  examples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --group dev --extra analysis
+      - name: run every example offline
+        working-directory: ${{ runner.temp }}
+        shell: bash # with pipefail: a script that crashes in front of 'tee' fails the job
+        run: |
+          for script in "$GITHUB_WORKSPACE"/examples/[0-9][0-9]_*.py; do
+            case "$(basename "$script")" in
+              01_*|02_*|03_*|04_*|08_*|09_*) flag=--simulate ;;
+              *) flag= ;;
+            esac
+            echo "::group::$(basename "$script")"
+            # --no-sync: a plain 'uv run' would sync the extra (scikit-learn) away again
+            uv run --no-sync --project "$GITHUB_WORKSPACE" python "$script" $flag | tee out.txt
+            echo "::endgroup::"
+          done
+          grep -q "cluster sizes:" out.txt  # the last script: K-means really ran
+
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --group dev
+      - run: uv build
+      - run: uv run twine check --strict dist/*
+      - name: install the wheel into a clean environment
+        run: |
+          uv venv --no-project /tmp/clean
+          uv pip install --python /tmp/clean/bin/python dist/*.whl
+      - run: /tmp/clean/bin/vispek-hc --version
+      - run: /tmp/clean/bin/vispek-hc --help
+      - run: /tmp/clean/bin/vispek-hc check --help
+      - run: /tmp/clean/bin/vispek-hc led on --help
+      - run: /tmp/clean/bin/vispek-hc check --json
+      - run: /tmp/clean/bin/vispek-hc setup --json
+      - name: the wheel carries the helper's sources and its licence
+        run: /tmp/clean/bin/python -c "import vispek_hc.controls as c; s = c.uvc_util_sources(); assert s == c.PACKAGED_SOURCES and c.changed_sources(s) == [], s"
+      - run: /tmp/clean/bin/vispek-hc check --simulate --json
+      - run: /tmp/clean/bin/vispek-hc led on 9 36 --hold 1 --simulate --json
+      - name: a whole measurement on the simulated device
+        run: |
+          cd "$RUNNER_TEMP"
+          /tmp/clean/bin/vispek-hc record -o sample --simulate --json
+          /tmp/clean/bin/vispek-hc reference white -o white --simulate --json
+          /tmp/clean/bin/vispek-hc calibrate --white white -o calibration --json
+          /tmp/clean/bin/vispek-hc reflectance sample --calib calibration -o cube.npz --json
+          /tmp/clean/bin/vispek-hc view sample --calib calibration --mode ndvi -o ndvi.png --json
+          /tmp/clean/bin/vispek-hc export sample --calib calibration --format envi -o envi --json
+      - name: the offline tour checks itself
+        run: cd "$RUNNER_TEMP" && /tmp/clean/bin/vispek-hc demo -o demo --json
+      - run: /tmp/clean/bin/python -m vispek_hc check
