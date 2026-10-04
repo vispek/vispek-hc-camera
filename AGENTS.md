@@ -10,8 +10,8 @@ frames taken one after another, one LED at a time. Pixel values are 8-bit code v
 after the camera's image processing; they are **not** linear radiance, and wavelengths
 are nominal LED centre wavelengths.
 
-Status: pre-release. On one real device scans of all 17 LEDs and a white reference (on
-white paper) work; a real reflectance standard has not been tried yet
+Status: released as `vispek-hc` 0.1.0 on PyPI, marked pre-alpha. On one real device scans
+of all 17 LEDs and a white reference (on white paper) work; a real reflectance standard has not been tried yet
 ([docs/acceptance/](docs/acceptance/README.md)).
 Everything runs on the simulated device (`--simulate`, `simulate=True`) and on recorded
 captures. Camera parameters can be locked on macOS (verified on the device) and on Linux
@@ -231,4 +231,7 @@ when the code under test needs one.
 - [docs/troubleshooting.md](docs/troubleshooting.md) - by symptom
 - [docs/provenance.md](docs/provenance.md) - what this implementation was written from
 - [docs/acceptance/](docs/acceptance/README.md) - acceptance records
+- [docs/release-checklist.md](docs/release-checklist.md) - how a release reaches PyPI
 - [CONTRIBUTING.md](CONTRIBUTING.md) - how to send changes
+- [`vispek-hc-viewer`](https://github.com/vispek/vispek-hc-viewer) - a separate package on PyPI:
+  a local web page for live view, LED control, scans and spectra, built on this SDK

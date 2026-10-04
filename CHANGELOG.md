@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- READMEs: installing from PyPI instead of "from a checkout until the first release";
+  the viewer, now on PyPI, is presented again.
+
 ## [0.1.0] - 2026-10-04
 
 The first release: SDK and command line for the Vispek HC1500. Light source over its

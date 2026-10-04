@@ -16,7 +16,7 @@ another, one LED at a time.
 
 ## Status
 
-Pre-release, under private development. **Checked on one real HC1500 so far:** serial
+Version 0.1, pre-alpha. **Checked on one real HC1500 so far:** serial
 protocol, frames, parameter lock, black level, timing, a scan of LEDs 5-17 and a white
 reference on white paper, and a scan of all 17 channels including the UV LEDs (see
 [docs/acceptance/](docs/acceptance/README.md)). A real reflectance standard has not been
@@ -28,19 +28,16 @@ Linux (built, not verified), not yet on Windows; see [docs/platforms.md](docs/pl
 
 Python 3.11 or newer, and `ffmpeg` on the `PATH` to read the camera.
 
-From a checkout (the only way until the first release):
-
 ```bash
-git clone https://github.com/vispek/vispek-hc-camera
-cd vispek-hc-camera
-uv sync                              # or: python -m venv .venv && .venv/bin/pip install -e .
-uv run vispek-hc check --simulate    # the whole stack on the simulated device
+python3 -m venv hc-env && source hc-env/bin/activate
+pip install vispek-hc
+vispek-hc setup                      # macOS: compiles the camera-control helper, once
+vispek-hc check --simulate           # the whole stack on the simulated device
 ```
 
-Once released, install the command into its own environment with
-`uv tool install vispek-hc` or `pipx install vispek-hc`. A plain `pip install` into the
-system Python is refused on current Linux and macOS (PEP 668); use one of the two, or a
-virtual environment.
+For the command alone, `uv tool install vispek-hc` or `pipx install vispek-hc` also work.
+A plain `pip install` into the system Python is refused on current Linux and macOS
+(PEP 668). To work on the code, clone this repository and run `uv sync`.
 
 ## A first picture, without hardware
 
@@ -115,6 +112,14 @@ processing. They are not linear radiance, relative reflectance is an index and n
 physical reflectance, and band wavelengths are nominal LED centre wavelengths, not a
 sensor response. Read [docs/calibration.md](docs/calibration.md) before you compare two
 scans.
+
+## A viewer
+
+[`vispek-hc-viewer`](https://github.com/vispek/vispek-hc-viewer) is a separate package
+built on this one: a page served to your own computer with the live picture, LED
+switches, scan and white-reference buttons, band pictures, indices and spectra. It
+records ordinary capture folders, so the command line and the viewer read each other's
+data. `pip install vispek-hc-viewer`.
 
 ## Documentation
 

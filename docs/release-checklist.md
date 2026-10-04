@@ -5,7 +5,8 @@ How a version of `vispek-hc` reaches PyPI. This page is for maintainers.
 ## Where the code lives
 
 Development happens in a private repository. This public repository receives one commit
-per release: the released tree as it is, made by a maintainer. Contributions sent here
+per release (the released tree as it is), and one for a documentation fix between
+releases, made by a maintainer. Its tree is always a tree of the private repository. Contributions sent here
 are carried over to the private repository and come back with the next release.
 
 ## Release settings

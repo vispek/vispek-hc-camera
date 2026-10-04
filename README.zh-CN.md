@@ -14,7 +14,7 @@
 
 ## 状态
 
-预发布，私有开发中。**目前只在一台真机上检查过**：串口协议、取帧、参数锁定、黑电平、
+0.1 版，pre-alpha。**目前只在一台真机上检查过**：串口协议、取帧、参数锁定、黑电平、
 时序、LED 5-17 的完整扫描、用白纸做的白板参考，以及含紫外灯在内的 17 通道扫描（见
 [docs/acceptance/](docs/acceptance/README.md)）。真正的反射率标准板尚未试过。下面的内容今天都能在随包提供的
 仿真设备上运行（`--simulate`）。相机参数锁定支持 macOS（已真机验证）和 Linux（已实现、未验证），Windows 尚不支持，见
@@ -24,18 +24,16 @@
 
 需要 Python 3.11 及以上；读相机需要 `PATH` 里有 `ffmpeg`。
 
-从源码安装（首个版本发布前唯一的方式）：
-
 ```bash
-git clone https://github.com/vispek/vispek-hc-camera
-cd vispek-hc-camera
-uv sync                              # 或：python -m venv .venv && .venv/bin/pip install -e .
-uv run vispek-hc check --simulate    # 在仿真设备上跑完整个栈
+python3 -m venv hc-env && source hc-env/bin/activate
+pip install vispek-hc
+vispek-hc setup                      # macOS：编译相机控制工具，只需一次
+vispek-hc check --simulate           # 在仿真设备上跑完整个栈
 ```
 
-发布后，用 `uv tool install vispek-hc` 或 `pipx install vispek-hc` 把命令装进独立环境。
-在当前的 Linux 和 macOS 上，直接对系统 Python 执行 `pip install` 会被拒绝（PEP 668）；
-请用上面两种方式之一，或用虚拟环境。
+只要命令行的话，也可以用 `uv tool install vispek-hc` 或 `pipx install vispek-hc`。在当前的
+Linux 和 macOS 上，直接对系统 Python 执行 `pip install` 会被拒绝（PEP 668）。要改代码，
+克隆本仓库后运行 `uv sync`。
 
 ## 不接硬件的第一张图
 
@@ -105,6 +103,13 @@ cube = capture.cube()  # .values (H, W, 波段数)、.rgb、.mask、.bands
 **这些数值是什么。** 像素值是经过相机内部图像处理的 8 位码值，不是线性辐射量；相对反射
 是一个指数，不是物理反射率；波段波长是 LED 的名义中心波长，不是传感器响应。比较两次
 扫描之前请先读 [docs/calibration.md](docs/calibration.md)。
+
+## 查看器
+
+[`vispek-hc-viewer`](https://github.com/vispek/vispek-hc-viewer) 是建立在本包之上的另一个包：
+在本机浏览器里打开的一个页面，有实时画面、LED 开关、扫描和白板参考按钮、单波段图、指数图
+和光谱。它记录的就是普通的采集文件夹，命令行和查看器可以互相读取对方的数据。
+`pip install vispek-hc-viewer`。
 
 ## 文档
 
