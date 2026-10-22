@@ -327,7 +327,9 @@ def linux_host(groups: Any = None, rules: Path = BRLTTY_RULES) -> dict[str, bool
         import grp as groups  # not on Windows; this function is only called on Linux
     try:
         gid = groups.getgrnam("dialout").gr_gid
-        member: bool | None = os.geteuid() == 0 or gid in os.getgroups()
+        # These POSIX functions are absent from Windows' type surface.
+        posix_os: Any = os
+        member: bool | None = posix_os.geteuid() == 0 or gid in posix_os.getgroups()
     except KeyError:
         member = None
     return {"dialout": member, "brltty": shutil.which("brltty") is not None or rules.exists()}
@@ -508,13 +510,16 @@ def _check(args: argparse.Namespace) -> Outcome:
                 "display"
             )
     if PLATFORM == "win32":
-        data["controls"] = {"backend": None, "binary": None}
-        problems.append(
-            ControlsUnavailableError(
-                "camera parameters cannot be locked on Windows yet",
-                hint="scan with --unlocked; such scans are comparable with nothing",
+        from vispek_hc._windows_controls import available
+
+        data["controls"] = {"backend": "directshow", "binary": None}
+        if not available():
+            problems.append(
+                ControlsUnavailableError(
+                    "Windows DirectShow camera controls are unavailable",
+                    hint="DirectShow controls require a Windows desktop installation",
+                )
             )
-        )
         if not data["serial"]["candidates"] and not args.simulate:
             warnings.append(
                 "no serial port: the light source's CH341 adapter needs the driver of its "
@@ -1145,6 +1150,11 @@ def _setup(args: argparse.Namespace) -> Outcome:
             "v4l2-ctl is not installed, so camera parameters cannot be locked: install "
             "v4l-utils (Debian, Ubuntu: sudo apt install v4l-utils)"
         )
+    elif PLATFORM == "win32":
+        from vispek_hc._windows_controls import available
+
+        if not available():
+            warnings.append("DirectShow controls require a Windows desktop installation")
     elif PLATFORM != "linux":
         warnings.append("camera controls are not built on this system yet; scans need --unlocked")
     return Outcome(
