@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-22
+
+### Fixed
+
+- Enable locked acquisition on Windows through DirectShow camera controls using
+  Python's standard library. Preserve caller COM apartments, validate driver
+  capabilities and convert exposure values to the camera's supported steps.
+- Report the Windows control backend in `check` and `setup`. Verified on one HC1500
+  for dark locking, pairing, LEDs 5-17, white-reference calibration and exports.
+  Acquisition defaults and UV permission requirements are unchanged.
+
 ### Changed
 
 - READMEs: installing from PyPI instead of "from a checkout until the first release";
