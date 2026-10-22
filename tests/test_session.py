@@ -529,8 +529,18 @@ def test_open_session_real_devices_are_assembled_and_cleaned_up(
     assert rig.device.closed
 
 
-def test_open_session_on_linux_controls_the_node_it_opened(
+@pytest.mark.parametrize(
+    ("platform", "backend", "device"),
+    [
+        ("linux", "v4l2-ctl", "/dev/video2"),
+        ("win32", "directshow", "LRCP 1080P-60FPS"),
+    ],
+)
+def test_open_session_controls_the_camera_it_opened(
     monkeypatch: pytest.MonkeyPatch,
+    platform: str,
+    backend: str,
+    device: str,
 ) -> None:
     rig = SimulatedRig()
 
@@ -541,8 +551,6 @@ def test_open_session_on_linux_controls_the_node_it_opened(
     asked: list[str] = []
 
     class FakeV4l2:
-        backend, device_id = "v4l2-ctl", "v4l2:/dev/video2"
-
         @classmethod
         def open(cls, device: str) -> Any:
             asked.append(device)
@@ -550,22 +558,22 @@ def test_open_session_on_linux_controls_the_node_it_opened(
 
     monkeypatch.setattr(session_module.Illuminator, "open", open_light)
     monkeypatch.setattr(session_module.video, "ffmpeg_version", lambda: (6, 1))
-    monkeypatch.setattr(
-        session_module.video, "list_cameras", lambda: ["/dev/video0", "/dev/video2"]
-    )
+    monkeypatch.setattr(session_module.video, "list_cameras", lambda: ["another camera", device])
     monkeypatch.setattr(
         session_module.video, "choose_camera", lambda explicit, names: explicit or names[1]
     )
     monkeypatch.setattr(session_module.video, "FfmpegSource", lambda camera, **options: rig.frames)
-    monkeypatch.setattr(session_module, "PLATFORM", "linux")
-    monkeypatch.setattr(session_module, "V4l2Controls", FakeV4l2)
-    rig.controls.backend, rig.controls.device_id = "v4l2-ctl", "v4l2:/dev/video2"  # type: ignore[attr-defined]
+    monkeypatch.setattr(session_module, "PLATFORM", platform)
+    monkeypatch.setattr(
+        session_module, "V4l2Controls" if platform == "linux" else "DirectShowControls", FakeV4l2
+    )
+    rig.controls.backend, rig.controls.device_id = backend, f"{backend}:{device}"  # type: ignore[attr-defined]
     with open_session() as session:
-        assert asked == ["/dev/video2"], "the node the frames come from, not the first one"
+        assert asked == [device], "the camera the frames come from, not the first one"
         assert session.controls is rig.controls
         assert session.describe()["controls"] == {
-            "backend": "v4l2-ctl",
-            "device_id": "v4l2:/dev/video2",
+            "backend": backend,
+            "device_id": f"{backend}:{device}",
         }
         assert session.lock_controls().gain_state == "dark"
 

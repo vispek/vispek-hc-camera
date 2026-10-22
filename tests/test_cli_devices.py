@@ -178,14 +178,17 @@ def test_linux_host_looks_at_the_dialout_group_and_at_brltty(
     assert LINUX_HOST(nobody, rules=tmp_path / "no-rules")["dialout"] is None, "no such group"
 
 
-def test_check_on_windows_points_to_the_serial_driver_and_says_controls_are_not_built(
+def test_check_on_windows_reports_directshow_and_points_to_a_missing_serial_driver(
     quiet_host: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     monkeypatch.setattr(cli, "PLATFORM", "win32")
+    from vispek_hc import _windows_controls
+
+    monkeypatch.setattr(_windows_controls, "available", lambda: True)
     _, envelope = run(capsys, "check", "--dry-run")
-    assert envelope["data"]["controls"] == {"backend": None, "binary": None}
+    assert envelope["data"]["controls"] == {"backend": "directshow", "binary": None}
     unavailable = [p for p in envelope["data"]["problems"] if p["code"] == "CONTROLS_UNAVAILABLE"]
-    assert len(unavailable) == 1 and "--unlocked" in unavailable[0]["hint"]
+    assert unavailable == []
     (driver,) = envelope["warnings"]
     assert "CH341" in driver and "WCH" in driver and "Device Manager" in driver
     monkeypatch.setattr(illuminator, "find_ports", lambda: ["COM5"])
@@ -727,6 +730,9 @@ def test_setup_on_linux_and_windows_builds_nothing_and_says_what_is_needed(
     _, envelope = run(capsys, "setup")
     assert envelope["data"]["helper"] == "/usr/bin/v4l2-ctl" and envelope["warnings"] == []
     monkeypatch.setattr(cli, "PLATFORM", "win32")
+    from vispek_hc import _windows_controls
+
+    monkeypatch.setattr(_windows_controls, "available", lambda: True)
     _, envelope = run(capsys, "setup")
     assert envelope["data"]["helper"] is None
-    assert "not built" in envelope["warnings"][0]
+    assert envelope["warnings"] == []

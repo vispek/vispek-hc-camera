@@ -37,6 +37,8 @@ def _no_real_devices(
 
     monkeypatch.setattr(serial, "Serial", refuse("serial.Serial"))
     monkeypatch.setattr(subprocess, "Popen", refuse("subprocess.Popen"))
+    # Python may invoke `cmd /c ver` to discover this on restricted Windows hosts.
+    monkeypatch.setattr(cli.platform, "machine", lambda: "AMD64")
     yield
     # Checked here as well: code under test may catch the AssertionError above.
     assert violations == []

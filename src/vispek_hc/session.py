@@ -17,6 +17,7 @@ from typing import Any, Self
 import numpy as np
 
 from vispek_hc import units, video
+from vispek_hc._windows_controls import DirectShowControls
 from vispek_hc.controls import (
     EXPOSURE_AUTOMATIC,
     EXPOSURE_MODE,
@@ -187,9 +188,9 @@ class Session:
         if self.controls is None:
             raise ControlsUnavailableError(
                 "no way to set camera parameters on this computer",
-                hint="macOS: build tools/uvc-util. Linux: install v4l-utils. Windows: not "
-                "built yet. Otherwise scan with --unlocked and accept that white balance and "
-                "exposure may move",
+                hint="macOS: build tools/uvc-util. Linux: install v4l-utils. Windows: install "
+                "the Windows dependencies and allow desktop camera access. Otherwise scan "
+                "with --unlocked and accept that white balance and exposure may move",
             )
         wanted = self.unit.camera_controls or self.model.initial_controls
         earlier = self.lock_report
@@ -317,12 +318,14 @@ def open_session(
         version = video.ffmpeg_version()
         name = video.choose_camera(camera, video.list_cameras())
         frames = video.FfmpegSource(name, size=size, fps=fps, source=source, version=version)
-        controls: UvcUtilControls | V4l2Controls | None = None
+        controls: UvcUtilControls | V4l2Controls | DirectShowControls | None = None
         try:
             if PLATFORM == "darwin":
                 controls = UvcUtilControls.open()
             elif PLATFORM == "linux":
                 controls = V4l2Controls.open(name)  # the node the frames come from
+            elif PLATFORM == "win32":
+                controls = DirectShowControls.open(name)
         except VispekHCError as error:  # preview still works; scans will insist on a lock
             log.warning("camera parameters cannot be locked: %s", error.message)
     except BaseException:
